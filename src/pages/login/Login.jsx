@@ -4,7 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-    const [loading,setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -18,20 +18,26 @@ export default function Login() {
         }));
     };
 
+    const setToken = (res) => {
+        return localStorage.setItem("token", res.data.token)
+    }
+
     const navigate = useNavigate();
 
-    const handleSubmit =async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             setLoading(true)
-            let res = await axios.post("https://role-base-routing-backend.vercel.app/api/v1/login",formData);
+            let res = await axios.post("https://role-base-routing-backend.vercel.app/api/v1/login", formData);
             setLoading(false)
-            if(res.data.role==="admin"){
+            if (res.data.role === "admin") {
+                setToken(res)
                 navigate("/admin-dashboard");
-                setFormData({email:"",password:""});
-            }else if (res.data.role==="user"){
+                setFormData({ email: "", password: "" });
+            } else if (res.data.role === "user") {
+                setToken(res)
                 navigate("/user-dashboard");
-                setFormData({email:"",password:""});
+                setFormData({ email: "", password: "" });
             }
         } catch (error) {
             toast.error("Login fail")
@@ -78,7 +84,7 @@ export default function Login() {
 
                 <button
                     type="submit"
-                    disabled = {loading}
+                    disabled={loading}
                     className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg  transition duration-300"
                 >
                     {
